@@ -21,7 +21,7 @@ contract YieldFarmLP {
     address private _uniLP;
     address private _communityVault;
     // contracts
-    IERC20 private _bond;
+    IERC20 private _ara;
     IStaking private _staking;
 
 
@@ -37,8 +37,8 @@ contract YieldFarmLP {
     event Harvest(address indexed user, uint128 indexed epochId, uint256 amount);
 
     // constructor
-    constructor(address bondTokenAddress, address uniLP, address stakeContract, address communityVault) public {
-        _bond = IERC20(bondTokenAddress);
+    constructor(address araTokenAddress, address uniLP, address stakeContract, address communityVault) public {
+        _ara = IERC20(araTokenAddress);
         _uniLP = uniLP;
         _staking = IStaking(stakeContract);
         _communityVault = communityVault;
@@ -66,7 +66,7 @@ contract YieldFarmLP {
         emit MassHarvest(msg.sender, epochId - lastEpochIdHarvested[msg.sender], totalDistributedValue);
 
         if (totalDistributedValue > 0) {
-            _bond.transferFrom(_communityVault, msg.sender, totalDistributedValue);
+            _ara.transferFrom(_communityVault, msg.sender, totalDistributedValue);
         }
 
         return totalDistributedValue;
@@ -78,7 +78,7 @@ contract YieldFarmLP {
         require (lastEpochIdHarvested[msg.sender].add(1) == epochId, "Harvest in order");
         uint userReward = _harvest(epochId);
         if (userReward > 0) {
-            _bond.transferFrom(_communityVault, msg.sender, userReward);
+            _ara.transferFrom(_communityVault, msg.sender, userReward);
         }
         emit Harvest(msg.sender, epochId, userReward);
         return userReward;
